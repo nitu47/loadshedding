@@ -29,9 +29,8 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 HEADERS = {"User-Agent": "LoadsheddingScraper/1.0 (+https://example)"}
 
-# -------------------------
 #  Utilities
-# -------------------------
+
 def fetch_page(url):
     resp = requests.get(url, headers=HEADERS, timeout=20)
     resp.raise_for_status()
@@ -92,9 +91,8 @@ def download_pdf(url, dest_folder="data/pdfs"):
                 f.write(chunk)
     return dest
 
-# -------------------------
+
 #  PDF text extraction
-# -------------------------
 def extract_text_from_pdf(path):
     texts = []
     try:
@@ -106,9 +104,9 @@ def extract_text_from_pdf(path):
         print("pdfplumber failed for", path, ":", e)
     return "\n\n".join(texts)
 
-# -------------------------
+
 #  Parsing heuristics
-# -------------------------
+
 # This block implements multiple regex attempts to find schedules.
 _DATE_PAT = r"(?:(?:\d{4}[-/]\d{1,2}[-/]\d{1,2})|(?:\d{1,2}[-/]\w+[-/]\d{4})|(?:\d{1,2}\s+\w+\s+\d{4}))"
 _TIME_PAT = r"(?:[01]?\d|2[0-3])[:.][0-5]\d"
@@ -203,9 +201,9 @@ def parse_schedule_text(text):
             cleaned.append(r)
     return cleaned
 
-# -------------------------
+
 #  High-level flow
-# -------------------------
+
 def build_from_nea():
     print("Scanning NEA for PDFs...")
     pdf_links = find_pdf_links_from_nea_home()
@@ -242,9 +240,8 @@ def build_from_nea():
         print("No valid schedule rows parsed from NEA PDFs.")
         return False
 
-# -------------------------
 #  Fallback: generate sample if nothing found
-# -------------------------
+
 def generate_sample(path=SAMPLE_FALLBACK, days=180):
     print("Generating fallback synthetic sample:", path)
     base = datetime(2024,1,1)
