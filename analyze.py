@@ -4,26 +4,26 @@ import matplotlib.pyplot as plt
 import os
 
 # --- Step 1: Choose dataset ---
-print("📂 Available datasets:")
+print(" Available datasets:")
 for f in ["loadshedding_real.csv", "loadshedding_sample.csv"]:
     if os.path.exists(f):
-        print(f"  ✅ {f}")
+        print(f"   {f}")
 choice = input("\nEnter dataset name to analyze (press Enter for 'loadshedding_real.csv'): ").strip()
 
 if choice == "":
     choice = "loadshedding_real.csv"
 
 if not os.path.exists(choice):
-    print(f"❌ File '{choice}' not found in this folder!")
+    print(f" File '{choice}' not found in this folder!")
     exit()
 
-print(f"\n📊 Using dataset: {choice}\n")
+print(f"\n Using dataset: {choice}\n")
 
 # --- Step 2: Load data ---
 try:
     df = pd.read_csv(choice, parse_dates=["date"])
 except Exception as e:
-    print(f"⚠️ Error loading CSV: {e}")
+    print(f" Error loading CSV: {e}")
     exit()
 
 # --- Step 3: Clean and calculate duration ---
@@ -32,7 +32,7 @@ if "start_time" in df.columns and "end_time" in df.columns:
     df["end_time"] = pd.to_datetime(df["end_time"], errors="coerce")
     df["duration_hrs"] = (df["end_time"] - df["start_time"]).dt.total_seconds() / 3600
 else:
-    print("⚠️ 'start_time' or 'end_time' columns missing; skipping duration calculation.")
+    print(" 'start_time' or 'end_time' columns missing; skipping duration calculation.")
     df["duration_hrs"] = 0
 
 df = df.dropna(subset=["date"])
@@ -78,4 +78,4 @@ if "district" in df.columns:
 # --- Step 7: Save summary ---
 summary = df.groupby("district")["duration_hrs"].agg(["count", "mean", "sum"]).reset_index()
 summary.to_csv("loadshedding_summary.csv", index=False)
-print("✅ Analysis complete! Summary saved to loadshedding_summary.csv")
+print(" Analysis complete! Summary saved to loadshedding_summary.csv")
