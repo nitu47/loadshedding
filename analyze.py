@@ -42,7 +42,7 @@ df["month"] = pd.to_datetime(df["date"]).dt.to_period("M")
 monthly = df.groupby("month")["duration_hrs"].sum().reset_index()
 
 plt.figure(figsize=(9, 5))
-plt.plot(monthly["month"].astype(str), monthly["duration_hrs"], marker="o", color="blue")
+plt.plot(monthly["month"].astype(str), monthly["duration_hrs"], marker="o")
 plt.title("Total Load-Shedding Hours per Month (NEA Trend)")
 plt.xlabel("Month")
 plt.ylabel("Total Hours")
@@ -57,7 +57,7 @@ weekday = df.groupby("weekday")["duration_hrs"].mean().reindex(
 )
 
 plt.figure(figsize=(8, 4))
-weekday.plot(kind="bar", color="skyblue")
+weekday.plot(kind="bar")
 plt.title("Average Outage Hours by Weekday")
 plt.xlabel("Weekday")
 plt.ylabel("Average Hours")
@@ -68,10 +68,36 @@ plt.show()
 if "district" in df.columns:
     district = df.groupby("district")["duration_hrs"].sum().sort_values(ascending=False)
     plt.figure(figsize=(8, 5))
-    district.plot(kind="barh", color="salmon")
+    district.plot(kind="barh")
     plt.title("Total Outage Hours by District")
     plt.xlabel("Total Hours")
     plt.ylabel("District")
+    plt.tight_layout()
+    plt.show()
+
+    # --- Step 6B: Highest loadshedding area analysis ---
+    top_district = district.idxmax()     # district name
+    top_value = district.max()           # hours value
+    print(f"\n Highest Load-shedding Area: {top_district} ({top_value:.2f} hours)")
+
+    top_df = df[df["district"] == top_district]
+    top_monthly = top_df.groupby("month")["duration_hrs"].sum().reset_index()
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(top_monthly["month"].astype(str), top_monthly["duration_hrs"], marker="o")
+    plt.title(f"Monthly Load-shedding Trend: {top_district}")
+    plt.xlabel("Month")
+    plt.ylabel("Total Hours")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    # Pie chart comparing top district vs others
+    plt.figure(figsize=(6, 6))
+    plt.pie([top_value, district.sum() - top_value],
+            labels=[f"{top_district} (Highest)", "Others"],
+            autopct="%1.1f%%", startangle=140)
+    plt.title("Load-shedding Share of Highest District")
     plt.tight_layout()
     plt.show()
 
