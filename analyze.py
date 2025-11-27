@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-# --- Step 1: Choose dataset ---
+# Step 1: Choose dataset 
 print(" Available datasets:")
 for f in ["loadshedding_real.csv", "loadshedding_sample.csv"]:
     if os.path.exists(f):
@@ -19,14 +19,14 @@ if not os.path.exists(choice):
 
 print(f"\n Using dataset: {choice}\n")
 
-# --- Step 2: Load data ---
+# Load data
 try:
     df = pd.read_csv(choice, parse_dates=["date"])
 except Exception as e:
     print(f" Error loading CSV: {e}")
     exit()
 
-# --- Step 3: Clean and calculate duration ---
+# Clean and calculate duration 
 if "start_time" in df.columns and "end_time" in df.columns:
     df["start_time"] = pd.to_datetime(df["start_time"], errors="coerce")
     df["end_time"] = pd.to_datetime(df["end_time"], errors="coerce")
@@ -38,7 +38,7 @@ else:
 df = df.dropna(subset=["date"])
 df["month"] = pd.to_datetime(df["date"]).dt.to_period("M")
 
-# --- Step 4: Monthly trend ---
+# Monthly trend
 monthly = df.groupby("month")["duration_hrs"].sum().reset_index()
 
 plt.figure(figsize=(9, 5))
@@ -50,7 +50,7 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-# --- Step 5: Weekday pattern ---
+# Step 5: Weekday pattern
 df["weekday"] = pd.to_datetime(df["date"]).dt.day_name()
 weekday = df.groupby("weekday")["duration_hrs"].mean().reindex(
     ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -64,7 +64,7 @@ plt.ylabel("Average Hours")
 plt.tight_layout()
 plt.show()
 
-# --- Step 6: District-wise total outage ---
+# District-wise total outage 
 if "district" in df.columns:
     district = df.groupby("district")["duration_hrs"].sum().sort_values(ascending=False)
     plt.figure(figsize=(8, 5))
@@ -101,7 +101,7 @@ if "district" in df.columns:
     plt.tight_layout()
     plt.show()
 
-# --- Step 7: Save summary ---
+# Step 7: Save summary
 summary = df.groupby("district")["duration_hrs"].agg(["count", "mean", "sum"]).reset_index()
 summary.to_csv("loadshedding_summary.csv", index=False)
 print(" Analysis complete! Summary saved to loadshedding_summary.csv")
